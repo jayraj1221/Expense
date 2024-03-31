@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Expense Dashboard</title>
+    <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> -->
+    <style>
+        .form-card {
+            margin-bottom: 20px;
+        }    
+        .row.content {height: 550px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+        
+    /* On small screens, set height to 'auto' for the grid */
+    @media screen and (max-width: 767px) {
+      .row.content {height: auto;} 
+    }
+    </style>
+</head>
+<body>
+      
+      <div class="container-fluid">
+        <div class="row content">
+          <div class="col-sm-3 sidenav hidden-xs">
+            <h2>Expense Tracker</h2>
+            <ul class="nav nav-pills nav-stacked">
+                <li class=""><a href="{% url 'index' %}">
+                    Dashboard</a></li>
+                    <li><a href="{% url 'category_dash' %}">Category</a></li>
+                    <li class="active"><a href="{% url 'expense_dash' %}">Expense</a></li>
+                    <li><a href="{% url 'generate_report' %}">Reports</a></li>
+                    <li><a href="{% url 'generate_graph' %}">Graph</a></li> 
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul><br>
+          </div>
+          <br>
+          
+          <div class="col-sm-9">
+            <div class="well">
+              <h4> {% block content %}
+                  {% if user.is_authenticated %}
+                      Hii, {{ user.username }}
+                  {% else %}
+                      <a href="\user_login">Login</a>
+                  {% endif %}
+             </h4>
+              <p>Track Expense...</p>
+            </div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-card">
+                <div class="card">
+                    <div class="card-header">Add Expense</div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'add_expense' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="category">Category:</label>
+                                <select class="form-control" id="category" name="category">
+                                    {% for category in categories %}
+                                        <option value="{{ category.name }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Name:</label>
+                                <input type="text" class="form-control" id="name" name="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount:</label>
+                                <input type="number" class="form-control" id="amount" name="amount">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="date">Date:</label>
+                                <input type="date" class="form-control" id="date" name="date">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Expense</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header centre">Expense List</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Description</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                                <tr>
+                                    <td>{{ expense.category }}</td>
+                                    <td>{{ expense.name }}</td>
+                                    <td>{{ expense.amount }}</td>
+                                    <td>{{ expense.description }}</td>
+                                    <td>{{ expense.date }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_expense' expense.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                                        <form action="{% url 'expense_delete' expense.pk %}" method="post" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are You Sure?')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6">No expenses found</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

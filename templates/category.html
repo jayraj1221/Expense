@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Category</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 550px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+        
+    /* On small screens, set height to 'auto' for the grid */
+    @media screen and (max-width: 767px) {
+      .row.content {height: auto;} 
+    }
+  </style>
+</head>
+<body>
+
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav hidden-xs">
+      <h2>Expense Tracker</h2>
+      <ul class="nav nav-pills nav-stacked">
+        <li class=""><a href="{% url 'index' %}">
+            Dashboard</a></li>
+            <li class="active"><a href="{% url 'category_dash' %}">Category</a></li>
+            <li><a href="{% url 'expense_dash' %}">Expense</a></li>
+            <li><a href="{% url 'generate_report' %}">Reports</a></li>
+            <li><a href="{% url 'generate_graph' %}">Graph</a></li> 
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+      </ul><br>
+    </div>
+    <br>
+    
+    <div class="col-sm-9">
+      <div class="well">
+        <h4> {% block content %}
+            {% if user.is_authenticated %}
+                Hii, {{ user.username }}
+            {% else %}
+                <a href="\user_login">Login</a>
+            {% endif %}
+        {% endblock %}</h4>
+        <p>Track Expense...</p>
+      </div>
+      <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-card">
+                    <div class="card">
+                        <div class="card-header">Create Category</div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'create_category' %}">
+                                {% csrf_token %}
+                                {% if form.errors.name %}
+                            <div class="invalid-feedback">{{ form.errors.name }}</div>
+                                {% endif %}
+                                <div class="form-group">
+                                    <label for="name">Name:</label>
+                                    <input type="text" class="form-control" id="name" name="name">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Create</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Categories</div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in categories %}
+                                    <tr>
+                                        
+                                        <td>{{ category.name }}</td>
+                                        <td>
+                                            <a href="{% url 'category_update' category.name %}" class="btn btn-primary btn-sm">Edit</a>
+                                            <form action="{% url 'category_delete' category.name %}" method="post" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are You Sure?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6">No Category found</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
